@@ -61,6 +61,7 @@ class MediaSessionHandlerMessengerService() : Service() {
                     msg
                 )
                 SessionHandlerMessageTypes.SET_M5_ENDPOINT -> setM5Endpoint(msg)
+                SessionHandlerMessageTypes.CONSUMPTION_REPORTING_MESSAGE -> reportConsumption(msg)
                 else -> super.handleMessage(msg)
             }
         }
@@ -146,6 +147,19 @@ class MediaSessionHandlerMessengerService() : Service() {
 
         }
 
+        private fun reportConsumption(msg: Message) {
+            val bundle: Bundle = msg.data as Bundle
+            val data: String = bundle.getString("ConsumptionData", "")
+
+            Log.i(TAG, "reportConsumption : $data")
+            Toast.makeText(
+                applicationContext,
+                "Media Session Handler Service received reportConsumption: $data",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            // todo: call m5 report to AF
+        }
     }
 
     private fun initializeRetrofitForServiceAccessInformation(url: String) {
