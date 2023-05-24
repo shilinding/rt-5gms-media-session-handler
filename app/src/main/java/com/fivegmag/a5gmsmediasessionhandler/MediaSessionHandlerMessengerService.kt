@@ -18,8 +18,11 @@ import android.widget.Toast
 import com.fivegmag.a5gmscommonlibrary.helpers.SessionHandlerMessageTypes
 import com.fivegmag.a5gmscommonlibrary.models.EntryPoint
 import com.fivegmag.a5gmscommonlibrary.models.ServiceAccessInformation
+import com.fivegmag.a5gmscommonlibrary.models.ConsumptionReporting
 import com.fivegmag.a5gmscommonlibrary.models.ServiceListEntry
 import com.fivegmag.a5gmsmediasessionhandler.network.ServiceAccessInformationApi
+import com.fivegmag.a5gmsmediasessionhandler.network.ConsumptionReportingApi
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -40,6 +43,8 @@ class MediaSessionHandlerMessengerService() : Service() {
     private lateinit var mMessenger: Messenger
     private lateinit var serviceAccessInformationApi: ServiceAccessInformationApi
     private lateinit var currentServiceAccessInformation: ServiceAccessInformation
+
+    private lateinit var consumptionReportingApi: ConsumptionReportingApi
 
     /** Keeps track of all current registered clients.  */
     var mClients = ArrayList<Int>()
@@ -154,22 +159,46 @@ class MediaSessionHandlerMessengerService() : Service() {
             Log.i(TAG, "reportConsumption : $data")
             Toast.makeText(
                 applicationContext,
-                "Media Session Handler Service received reportConsumption: $data",
-                Toast.LENGTH_SHORT
+                "MSH received Consumption: $data",
+                Toast.LENGTH_LONG
             ).show()
 
-            // todo: call m5 report to AF
+            // todo: call m5 report consumption to AF
+            val aspId: String = "2";
+            val call: Call<ResponseBody>? = consumptionReportingApi.postConsumptionReporting(aspId);
+            Log.i(TAG, ">>>>>>>>>>shilin>>0")
+            call?.enqueue(object : retrofit2.Callback<ResponseBody> {
+                override fun onResponse(
+                    call: Call<ResponseBody?>,
+                    response: Response<ResponseBody?>
+                ) {
+                    //System.out.println(">>>>>>>>>>shilin>>");
+                    Log.i(TAG, ">>>>>>>>>>shilin>>1:repp from AF>>"+ response.body()?.string())
+                    //System.out.println(">>>>>>>>>>>>"+response.body());
+                }
+
+                override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
+                    Log.i(TAG, ">>>>>>>>>>shilin>>2")
+                    call.cancel()
+                }
+            })
         }
     }
 
     private fun initializeRetrofitForServiceAccessInformation(url: String) {
-        val retrofitServiceAccessInformation: Retrofit = Retrofit.Builder()
+        val m5Retrofit: Retrofit = Retrofit.Builder()
             .baseUrl(url)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
 
-        serviceAccessInformationApi =
-            retrofitServiceAccessInformation.create(ServiceAccessInformationApi::class.java)
+        serviceAccessInformationApi = m5Retrofit.create(ServiceAccessInformationApi::class.java)
+
+
+        val m5RetrofitConsump: Retrofit = Retrofit.Builder()
+            .baseUrl(url)
+            //.addConverterFactory(GsonConverterFactory.create())
+            .build()
+        consumptionReportingApi     = m5RetrofitConsump.create(ConsumptionReportingApi::class.java)
     }
 
     /**
