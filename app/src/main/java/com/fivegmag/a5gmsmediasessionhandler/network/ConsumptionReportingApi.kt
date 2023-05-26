@@ -20,8 +20,8 @@ import retrofit2.http.POST
 import retrofit2.http.GET
 
 interface ConsumptionReportingApi {
-    //@FormUrlEncoded
-    @GET("consumption-reporting/{aspId}")
-    fun postConsumptionReporting(@Path("aspId") aspId: String?): Call<ResponseBody>?
+    @FormUrlEncoded
+    @POST("consumption-reporting/{aspId}")
+    fun postConsumptionReporting(@Path("aspId") aspId: String?, @Field("data") data: String): Call<ResponseBody>?
     //fun postConsumptionReporting(@Path("aspId") aspId: String?, @Field("data") data: String ): Call<String>?
 }

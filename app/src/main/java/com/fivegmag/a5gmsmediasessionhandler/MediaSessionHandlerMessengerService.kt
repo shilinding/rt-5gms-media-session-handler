@@ -120,6 +120,8 @@ class MediaSessionHandlerMessengerService() : Service() {
                             currentServiceAccessInformation.streamingAccess.entryPoints
                     }
 
+                    val serverAddresses: String  = currentServiceAccessInformation.clientConsumptionReportingConfiguration.serverAddresses;
+                    Log.i(TAG, ">>>shilin: clientConsumptionReportingConfiguration serverAddresses:  $serverAddresses.")
 
                     val bundle = Bundle()
                     if (finalEntryPoints != null && finalEntryPoints.size > 0) {
@@ -165,7 +167,7 @@ class MediaSessionHandlerMessengerService() : Service() {
 
             // todo: call m5 report consumption to AF
             val aspId: String = "2";
-            val call: Call<ResponseBody>? = consumptionReportingApi.postConsumptionReporting(aspId);
+            val call: Call<ResponseBody>? = consumptionReportingApi.postConsumptionReporting(aspId,data);
             Log.i(TAG, ">>>>>>>>>>shilin>>0")
             call?.enqueue(object : retrofit2.Callback<ResponseBody> {
                 override fun onResponse(
@@ -173,7 +175,7 @@ class MediaSessionHandlerMessengerService() : Service() {
                     response: Response<ResponseBody?>
                 ) {
                     //System.out.println(">>>>>>>>>>shilin>>");
-                    Log.i(TAG, ">>>>>>>>>>shilin>>1:repp from AF>>"+ response.body()?.string())
+                    Log.i(TAG, ">>>>>>>>>>shilin>>1:resp from AF>>"+ response.body()?.string())
                     //System.out.println(">>>>>>>>>>>>"+response.body());
                 }
 
